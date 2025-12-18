@@ -1,0 +1,27 @@
+@Override
+    public Mobile readMobile(Long id) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Mobile mobile = null;
+        String query = "SELECT id,brand,model,year_launched,price FROM mobile WHERE id = ?";
+        try{
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mobile_db", "root","root");
+            ps=con.prepareStatement(query);
+            ps.setLong(1,id);
+            rs=ps.executeQuery();
+            while(rs.next()){
+                String brand = rs.getString(2);
+                String model = rs.getString(3);
+                Integer year_launched = rs.getInt(4);
+                Double price = rs.getDouble(5);
+                mobile = new Mobile(id,brand,model,year_launched,price);
+            }
+            rs.close();
+            ps.close();
+            con.close();
+        }catch(SQLException e){
+            System.out.println("Error while reading One mobile: " + e.getMessage());
+        }
+        return mobile;
+    }
