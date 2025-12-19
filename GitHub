@@ -1,0 +1,22 @@
+Register to git hub,login and create new Repository MCEAdvancedJava.
+
+Install Git
+Command prompt -> Navigate to your project folder
+
+git --version
+git config --global user.name john
+git config --global user.email john@careercraftacademy.com
+git config user.name
+git config user.email
+git config --global init.defaultBranch main
+git init 
+git status
+git add .
+git commit -m 'Initial_Commit'
+git log
+git checkout 440....
+git checkout main
+git remote add origin https://github.com/JohnPhilip80/MCEAdvancedJava.git
+
+
+git clone https://github.com/JohnPhilip80/MCEAdvancedJava
