@@ -1,0 +1,46 @@
+package edu.mce.john.mobileshop.repositories;
+
+
+
+import edu.mce.john.mobileshop.models.Mobile;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class MobileRepositoryTest {
+    private MobileRepository repo;
+    @Test
+    void testReadMobiles(){
+        repo = new MobileRepository();
+        List<Mobile> mobiles = repo.readMobiles();
+        assertTrue(mobiles.size() > 1000);
+    }
+    @Test
+    void testCreateMobile(){
+        repo = new MobileRepository();
+        int id = repo.createMobile(new Mobile(1L,"Poco","M52",2023,54200.00));
+        assertTrue(id > 1000);
+    }
+    @Test
+    void testUpdateMobile(){
+        repo = new MobileRepository();
+        int id = repo.updateMobile(new Mobile(1000L,"Poco","M52",2023,54200.00));
+        Mobile mb = repo.readMobile(1000L);
+        assertEquals("Poco",mb.getBrand());
+    }
+    @Test
+    void testDeleteMobile(){
+        repo = new MobileRepository();
+        int id = repo.deleteMobile(1000L);
+        assertNull(repo.readMobile(1000L));
+    }
+    @Test
+    void testReadMobile(){
+        repo = new MobileRepository();
+        Mobile mobile =  repo.readMobile(999L);
+        assertNotNull(mobile);
+        assertEquals("Nokia",mobile.getBrand());
+    }
+}
