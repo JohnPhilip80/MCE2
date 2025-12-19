@@ -1,0 +1,195 @@
+package edu.mce.john.mobileshop.services;
+
+import edu.mce.john.mobileshop.models.Mobile;
+import edu.mce.john.mobileshop.models.MobileWithDiscount;
+import edu.mce.john.mobileshop.repositories.MobileRepository;
+import edu.mce.john.mobileshop.utils.BrandFilter;
+import edu.mce.john.mobileshop.utils.PriceFilter;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class StreamServices {
+    private MobileRepository repo;
+    private Scanner scan;
+    private List<Mobile> mobiles;
+
+    public StreamServices(){
+        repo = new MobileRepository();
+        mobiles = repo.readMobiles();
+        scan = new Scanner(System.in);
+    }
+
+    public void showAllMobiles() {
+        for (int index = 0; index < mobiles.size(); index++) {
+            System.out.println(mobiles.get(index));
+        }
+    }
+    public void filterMobilesByBrand(){
+        String brand;
+        System.out.println("Enter Brand Name to Filter:");
+        brand = scan.nextLine();
+        mobiles.stream()
+                .filter((mobile)-> !(mobile.getBrand().equals(brand)))
+                .forEach(System.out::println);
+    }
+    public void filterMobilesByPrice(){
+        Double price;
+        System.out.println("Enter Price:");
+        price = scan.nextDouble();
+        mobiles.stream()
+                .filter((mobile) -> mobile.getPrice() > price)
+                .forEach(System.out::println);
+    }
+
+    public void filterMobilesByPriceAndBrand(){
+        String brand;
+        System.out.println("Enter Brand Name to Filter:");
+        brand = scan.nextLine();
+
+        Double price;
+        System.out.println("Enter Price:");
+        price = scan.nextDouble();
+        mobiles.stream()
+                .filter((mobile) -> mobile.getPrice() < price)
+                .filter((mobile) -> mobile.getBrand().equals(brand))
+                .forEach(System.out::println);
+    }
+    public void findMobile(){
+        mobiles.stream()
+                .filter((mobile) -> mobile.getBrand().equals("Samsung"))
+                .filter((mobile) -> mobile.getModel().startsWith("A"))
+                .forEach(System.out::println);
+    }
+
+    public void sortMobilesByPrice(){
+        mobiles.stream()
+                .sorted(Comparator.comparing(Mobile::getPrice))
+                .forEach(System.out::println);
+    }
+
+    public void sortMobilesByBrand(){
+        mobiles.stream()
+                .sorted(Comparator.comparing(Mobile::getModel))
+                .forEach(System.out::println);
+    }
+
+    public void showSingleColumn(){
+        mobiles.stream()
+                .map(Mobile::getModel)
+                .forEach(System.out::println);
+    }
+
+    public void showUniqueColumnValues(){
+        mobiles.stream()
+                .map(Mobile::getBrand)
+                .distinct()
+                .forEach(System.out::println);
+    }
+
+    public void upperCaseColumn(){
+        mobiles.stream()
+                .map((mobile) -> new Mobile(
+                        mobile.getId(),
+                        mobile.getBrand().toUpperCase(),
+                        mobile.getModel(),
+                        mobile.getYear_launched(),
+                        mobile.getPrice()))
+                .forEach(System.out::println);
+    }
+    public void discountPriceColumn(){
+        mobiles.stream()
+                .map((mobile) -> new MobileWithDiscount(
+                        mobile.getId(),
+                        mobile.getBrand(),
+                        mobile.getModel(),
+                        mobile.getYear_launched(),
+                        mobile.getPrice(),
+                        mobile.getPrice() - (mobile.getPrice() * 0.20)))
+                .forEach(System.out::println);
+    }
+
+    public void countMobilesOfABrand(){
+        String brand;
+        System.out.println("Enter Brand:");
+        brand = scan.nextLine();
+        long total = mobiles.stream()
+                .filter((mobile) -> (mobile.getBrand().equals(brand)))
+                .count();
+        System.out.println("Totally " + total + " mobiles in " + brand);
+    }
+
+    public void minPriceOfABrand(){
+        String brand;
+        System.out.println("Enter Brand:");
+        brand = scan.nextLine();
+        Optional<Mobile> minPriceMobile = mobiles.stream()
+                .filter((mobile) -> (mobile.getBrand().equals(brand)))
+                .min(Comparator.comparingDouble(Mobile::getPrice));
+        System.out.println(minPriceMobile.get());
+    }
+
+    public void maxPriceOfABrand(){
+        String brand;
+        System.out.println("Enter Brand:");
+        brand = scan.nextLine();
+        Optional<Mobile> minPriceMobile = mobiles.stream()
+                .filter((mobile) -> (mobile.getBrand().equals(brand)))
+                .max(Comparator.comparingDouble(Mobile::getPrice));
+        System.out.println(minPriceMobile.get());
+    }
+    public void mobileCountOfEachBrand(){
+        Map<String,Long> mobilesCount = mobiles.stream()
+                .collect(Collectors.groupingBy(Mobile::getBrand,Collectors.counting()));
+
+        mobilesCount.forEach((key,value) -> System.out.println(key + " - " + value));
+    }
+    public void minPriceMobileForEachBrand(){
+        Map<String,Optional<Mobile>> minMobiles = mobiles.stream()
+                .collect(Collectors.groupingBy(Mobile::getBrand,
+                        Collectors.minBy(Comparator.comparingDouble(Mobile::getPrice))));
+        minMobiles.forEach((key,value) -> System.out.println(value.get()));
+    }
+    public void maxPriceMobileForEachBrand(){
+        Map<String,Optional<Mobile>> maxMobiles = mobiles.stream()
+                .collect(Collectors.groupingBy(Mobile::getBrand,
+                        Collectors.maxBy(Comparator.comparingDouble(Mobile::getPrice))));
+        maxMobiles.forEach((key,value) -> System.out.println(value.get()));
+    }
+    public void showPage(){
+        int pageSize = 0;
+        int pageNumber = 0;
+
+        System.out.println("Enter Page Size:");
+        pageSize = scan.nextInt();scan.nextLine();
+
+        System.out.println("Enter Page Number:");
+        pageNumber = scan.nextInt();scan.nextLine();
+
+        mobiles.stream()
+                .skip((pageNumber -1) * pageSize)
+                .limit(pageSize)
+                .forEach(System.out::println);
+    }
+
+    public void showPageForABrand(){
+        int pageSize = 0;
+        int pageNumber = 0;
+        String brand;
+
+        System.out.println("Enter Page Size:");
+        pageSize = scan.nextInt();scan.nextLine();
+
+        System.out.println("Enter Page Number:");
+        pageNumber = scan.nextInt();scan.nextLine();
+
+        System.out.println("Enter Brand:");
+        brand = scan.nextLine();
+
+        mobiles.stream()
+                .filter((mobile) -> (mobile.getBrand().equals(brand)))
+                .skip((pageNumber -1) * pageSize)
+                .limit(pageSize)
+                .forEach(System.out::println);
+    }
+}
